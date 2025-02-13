@@ -1,5 +1,5 @@
 import { createCallerFactory, mergeRouters, router } from "../trpc";
-import publicProcedure from "../procedures/public-procedure";
+import publicProcedure from "../procedures/public";
 import { createContext } from "../context";
 
 export const helloRouter = router({
