@@ -39,6 +39,21 @@ const isOptionalAuth = middleware( async (opts) => {
   });
 });
 
+const isAdmin = middleware( async (opts) =>{
+  const session = await auth();
+
+  if(!session || !session.user || session.user.role !== "ADMIN"){
+    throw new TRPCError ({ code: "UNAUTHORIZED - ADMIN PERMISSIONS REQUIRED"})
+  }
+
+  return opts.next({
+    ctx: {
+      userID: session.user.id,
+      role: session.user.role,
+    },
+  });
+});
+
 const isAdmin = t.middleware(({ ctx, next}) => {
   if (ctx.role !== 'ADMIN') {
     throw new TRPCError ({ code: 'FORBIDDEN'});
