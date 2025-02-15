@@ -43,7 +43,7 @@ const isAdmin = middleware( async (opts) =>{
   const session = await auth();
 
   if(!session || !session.user || session.user.role !== "ADMIN"){
-    throw new TRPCError ({ code: "UNAUTHORIZED - ADMIN PERMISSIONS REQUIRED"})
+    throw new TRPCError ({ code: "UNAUTHORIZED"})
   }
 
   return opts.next({
@@ -54,17 +54,8 @@ const isAdmin = middleware( async (opts) =>{
   });
 });
 
-const isAdmin = t.middleware(({ ctx, next}) => {
-  if (ctx.role !== 'ADMIN') {
-    throw new TRPCError ({ code: 'FORBIDDEN'});
-  }
-  return next ({ ctx });
-});
-
-//Procedure builders
+//Defines API Routes with different access levels
 export const publicProcedure = t.procedure.use(isOptionalAuth);
 export const privateProcedure = t.procedure.use(isAuth);
 export const adminProcedure = t.procedure.use(isAuth).use(isAdmin);
-
 export const router = t.router;
-export const middleware = t.middleware; 
