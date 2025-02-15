@@ -10,7 +10,13 @@ export type Context = { //Creates a custom type called Context - essentially an 
 export async function createContext(): Promise<Context> { //Defines async function, 'createContext', returns promise of the Context object
   const session = await auth(); //Calls auth function and waits to return a result, the result is stored in the session variable
 
+  if (!session?.user) {  //If there is no user, session: null
+    return { session: null };
+  }
 
+  return { //Else, return session, userID and role
+    session, 
+    userID: session.user.id,
+    role: session.user.role,
+  };
 }
-
-export { handler as GET, handler as POST };
