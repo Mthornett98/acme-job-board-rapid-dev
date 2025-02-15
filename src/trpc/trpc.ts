@@ -7,7 +7,8 @@ type Context = { //Creates a type called Context which contains the Session obje
   session: Session | null;
 };
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create(); //Creates tRPC instance that will be used to define API routes based off user Context
+const middleware = t.middleware; //middleware is a helper function that allows us to add extra rules to certain API routes (e.g. check if a user is logged in)
 
 //Middleware for authentication
 const isAuth = t.middleware(({ ctx, next }) => {
