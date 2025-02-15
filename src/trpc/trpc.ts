@@ -11,11 +11,19 @@ const t = initTRPC.context<Context>().create(); //Creates tRPC instance that wil
 const middleware = t.middleware; //middleware is a helper function that allows us to add extra rules to certain API routes (e.g. check if a user is logged in)
 
 //Middleware for authentication
-const isAuth = t.middleware(({ ctx, next }) => {
-  if (!ctx.userID) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+const isAuth = middleware(async (opts) => {
+  const session = await auth();
+
+  if (!session || !session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED"});
   }
-  return next({ ctx });
+
+  return opts.next({
+    ctx: {
+      userID: session.user.ID,
+      role: session.user.role,
+    },
+  });
 });
 
 const isOptionalAuth = t.middleware(({ ctx, next }) => {
