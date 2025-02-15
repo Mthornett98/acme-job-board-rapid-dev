@@ -5,6 +5,12 @@ export type Context = { //Creates a custom type called Context - essentially an 
   session: Session | null; //States that session can either be a Session object (if someone is logged in) or null if no one is logged in
   userID?: string; //States that userID is a string and is optional (?)
   role?: string; //States that the role is a string and is an optional property (due to ?)
-} 
+}; 
+
+export async function createContext(): Promise<Context> { //Defines async function, 'createContext', returns promise of the Context object
+  const session = await auth(); //Calls auth function and waits to return a result, the result is stored in the session variable
+
+
+}
 
 export { handler as GET, handler as POST };
