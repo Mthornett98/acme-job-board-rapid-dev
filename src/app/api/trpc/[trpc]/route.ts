@@ -1,6 +1,5 @@
-import { createContext } from "@/trpc/context";
-import { appRouter } from "@/trpc/router/_app";
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { auth } from "@/app/auth"; //Bringing in function called auth from /app/auth
+import { type Session } from "@next-auth"; //Imports a session from next-auth, a library used for auth in Next.js
 
 const handler = (request: Request) => {
   return fetchRequestHandler({
