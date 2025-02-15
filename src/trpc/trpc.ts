@@ -3,6 +3,10 @@ import { auth } from "@/app/auth"; //Imports auth function for use in this file
 import { TRPCError, initTRPC } from "@trpc/server"; //Imports both functions. TRPCError for error handling. initTRPC to define access to different routes.
 import { Session } from "next-auth"; //Imports the Session object so we can see user details (ID, Role)
 
+type Context = { //Creates a type called Context which contains the Session objectif the user is logged in, or null if no one is logged in
+  session: Session | null;
+};
+
 const t = initTRPC.context<Context>().create();
 
 //Middleware for authentication
