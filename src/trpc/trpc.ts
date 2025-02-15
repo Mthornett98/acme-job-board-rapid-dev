@@ -26,8 +26,17 @@ const isAuth = middleware(async (opts) => {
   });
 });
 
-const isOptionalAuth = t.middleware(({ ctx, next }) => {
-  return next({ ctx });
+const isOptionalAuth = middleware( async (opts) => {
+  const session = await auth();
+
+  return opts.next({
+    ctx: session
+      ?{
+          userID: session.user.id,
+          role: session.user.role, 
+       }
+      : undefined,
+  });
 });
 
 const isAdmin = t.middleware(({ ctx, next}) => {
