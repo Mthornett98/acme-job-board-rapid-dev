@@ -1,19 +1,57 @@
 // trpc/trpc.ts
-import { initTRPC, TRPCError } from "@trpc/server";
-import { Context } from "./context";
+import { auth } from "@/app/auth"; //Imports auth function for use in this file
+import { TRPCError, initTRPC } from "@trpc/server"; //Imports both functions. TRPCError for error handling. initTRPC to define access to different routes.
+import { Session } from "next-auth"; //Imports the Session object so we can see user details (ID, Role)
 
-const t = initTRPC.context<Context>().create();
+type Context = { //Creates a type called Context which contains the Session objectif the user is logged in, or null if no one is logged in
+  session: Session | null;
+};
+
+const t = initTRPC.context<Context>().create(); //Creates tRPC instance that will be used to define API routes based off user Context
+const middleware = t.middleware; //middleware is a helper function that allows us to add extra rules to certain API routes (e.g. check if a user is logged in)
 
 //Middleware for authentication
-const isAuth = t.middleware(({ ctx, next }) => {
-  if (!ctx.userID) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+const isAuth = middleware(async (opts) => {
+  const session = await auth();
+
+  if (!session || !session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED"});
   }
-  return next({ ctx });
+
+  return opts.next({
+    ctx: {
+      userID: session.user.ID,
+      role: session.user.role,
+    },
+  });
 });
 
-const isOptionalAuth = t.middleware(({ ctx, next }) => {
-  return next({ ctx });
+const isOptionalAuth = middleware( async (opts) => {
+  const session = await auth();
+
+  return opts.next({
+    ctx: session
+      ?{
+          userID: session.user.id,
+          role: session.user.role, 
+       }
+      : undefined,
+  });
+});
+
+const isAdmin = middleware( async (opts) =>{
+  const session = await auth();
+
+  if(!session || !session.user || session.user.role !== "ADMIN"){
+    throw new TRPCError ({ code: "UNAUTHORIZED - ADMIN PERMISSIONS REQUIRED"})
+  }
+
+  return opts.next({
+    ctx: {
+      userID: session.user.id,
+      role: session.user.role,
+    },
+  });
 });
 
 const isAdmin = t.middleware(({ ctx, next}) => {
